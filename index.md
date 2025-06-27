@@ -11,7 +11,7 @@
 - [整合 Oxidized 與 Weathermap](network-monitoring/weathermap.md)
 
 ### ✔ GLPI 資產與維護管理平台
-- [GLPI Server 架設](asset-management/glpi.md)
+- [GLPI Server 架設](asset-management/GLPI Server架設)
 - [LDAP / AD 整合測試紀錄](asset-management/ad-integration.md)
 
 ### ✔ FortiGate 防火牆
