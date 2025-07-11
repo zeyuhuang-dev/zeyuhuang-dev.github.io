@@ -112,10 +112,6 @@ GRANT ALL PRIVILEGES ON glpidb.* TO 'glpiuser'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 ```
-```
-sudo systemctl restart nginx
-sudo systemctl restart php-fpm
-```
 **12. 下載 GLPI 原始檔案**
 ```
 cd /var/www/html
