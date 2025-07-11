@@ -9,7 +9,7 @@ title: GLPI Server架設–網頁安裝開始
 ![2025-07-11_121537](/pics/glpi/002.png)
 ![2025-07-11_121616](/pics/glpi/003.png)
 **跳出錯誤**
-![2025-07-11_121645](/pics/glpi/004png)
+![2025-07-11_121645](/pics/glpi/004.png)
 **解決方式：先對 config/ 資料夾給「暫時寫入權限」**
 ```
 chmod -R 777 /var/www/html/glpi/config
