@@ -1,9 +1,9 @@
 ---
-title: GLPI Server架設
+title: GLPI Server架設 Apache
 
 ---
 
-**GLPI Server架設**
+**GLPI Server架設 Apache version**
 **1. Install OS: Rocky Linux 9 Minimal**
 ```
 Rocky-9.6-x86_64-minimal.iso
@@ -14,21 +14,22 @@ dnf update -y
 ```
 **3. Install tools**
 ```
-dnf install -y epel-release vim wget curl unzip git net-tools
+dnf install -y epel-release vim wget curl unzip bash-completion git net-tools
 ```
-**4. 安裝 Nginx + MariaDB + PHP（OCS/GLPI 需要）**
+**4. 安裝 Apache**
 ```
-dnf install -y nginx mariadb-server mariadb
+dnf install -y httpd
+systemctl enable --now httpd
 ```
 **5. 安裝 PHP**
 ```
+dnf module reset php -y
+dnf module enable php:8.1 -y
 dnf install php php-fpm php-mysqlnd php-xml php-gd php-curl php-mbstring php-zip php-cli php-soap php-intl php-json php-bcmath
 ```
-**6. 啟用並開啟服務自動啟動**
+**6. 重啟 Apache 以套用 PHP：**
 ```
-sudo systemctl enable --now nginx
-sudo systemctl enable --now mariadb
-sudo systemctl enable --now php-fpm
+systemctl restart httpd
 ```
 **7. 防火牆開放 port 80, 443**
 ```
@@ -36,7 +37,12 @@ sudo firewall-cmd --permanent --add-service=http
 sudo firewall-cmd --permanent --add-service=https
 sudo firewall-cmd --reload
 ```
-**8. 安全化 MariaDB 安裝**
+**8. 安裝 MariaDB**
+```
+dnf install -y mariadb-server
+systemctl enable --now mariadb
+```
+**9. 安全化 MariaDB 安裝**
 ```
 sudo mysql_secure_installation
 ```
@@ -91,98 +97,11 @@ will take effect immediately.
 
 Reload privilege tables now? [Y/n] Y
 ```
-**9. 再次確認PHP 及常用模組是否皆已安裝**
+**10. 再次確認PHP 及常用模組是否皆已安裝**
 ```
 dnf install php php-cli php-fpm php-mysqlnd php-xml php-mbstring php-gd php-curl php-json php-intl php-opcache php-zip -y
 ```
-**10. 設定 Nginx config**
-```
-mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
-```
-```
-vim /etc/nginx/nginx.conf
-```
-```
-user nginx;
-worker_processes auto;
-error_log /var/log/nginx/error.log;
-pid /run/nginx.pid;
-
-events {
-    worker_connections 1024;
-}
-
-http {
-    include       /etc/nginx/mime.types;
-    default_type  application/octet-stream;
-
-    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
-                    '$status $body_bytes_sent "$http_referer" '
-                    '"$http_user_agent" "$http_x_forwarded_for"';
-
-    access_log /var/log/nginx/access.log main;
-
-    sendfile        on;
-    keepalive_timeout 65;
-
-    server {
-        listen       80 default_server;
-        server_name  _;
-
-        root /var/www/html/glpi;
-        index index.php index.html index.htm;
-
-        location / {
-            try_files $uri $uri/ /index.php?$query_string;
-        }
-
-        location ~ \.php$ {
-            try_files $uri =404;
-            include fastcgi_params;
-            fastcgi_index index.php;
-            fastcgi_pass unix:/run/php-fpm/www.sock;
-            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-            fastcgi_param DOCUMENT_ROOT $document_root;
-        }
-
-
-        location ~ /\.ht {
-            deny all;
-        }
-    }
-}
-```
-**11. 建立 GLPI 網站目錄**
-```
-sudo mkdir -p /var/www/html/glpi
-sudo chown -R nginx:nginx /var/www/html/glpi
-```
-**12. 測試 Nginx 配置**
-```
-sudo nginx -t
-```
-**13. 重啟 Nginx**
-```
-sudo systemctl restart nginx
-```
-**14. 下載 GLPI 原始檔案**
-```
-cd /tmp
-```
-```
-wget https://github.com/glpi-project/glpi/releases/tag/10.0.18/glpi-10.0.18.tgz
-```
-```
-tar -xvzf glpi-10.0.18.tgz
-```
-```
-mv glpi /var/www/html/
-```
-```
-sudo chown -R apache:apache /var/www/html/glpi
-sudo chmod -R 755 /var/www/html/glpi
-```
-**15. 建立 MariaDB 資料庫和帳號**
+**11. 建立 MariaDB 資料庫和帳號**
 ```
 sudo mysql -u root -p
 ```
@@ -197,7 +116,45 @@ EXIT;
 sudo systemctl restart nginx
 sudo systemctl restart php-fpm
 ```
-**16. 開始網頁安裝**
+**12. 下載 GLPI 原始檔案**
 ```
-http://192.168.5.11/glpi
+cd /var/www/html
+```
+```
+wget https://github.com/glpi-project/glpi/releases/tag/10.0.18/glpi-10.0.18.tgz
+```
+```
+tar -xvzf glpi-10.0.18.tgz
+```
+```
+rm -f glpi-10.0.18.tgz
+```
+```
+sudo chown -R apache:apache /var/www/html/glpi
+sudo chmod -R 755 /var/www/html/glpi
+```
+**13. 設定 Apache config**
+```
+vim /etc/httpd/conf.d/glpi.conf
+```
+```
+<VirtualHost *:80>
+    ServerName glpi2.ace-acc.com.tw
+    DocumentRoot /var/www/html/glpi
+
+    <Directory /var/www/html/glpi>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog /var/log/httpd/glpi_error.log
+    CustomLog /var/log/httpd/glpi_access.log combined
+</VirtualHost>
+```
+```
+systemctl restart httpd
+```
+**14. 開始網頁安裝**
+```
+http://glpi2.ace-acc.com.tw
 ```

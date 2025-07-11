@@ -1,4 +1,4 @@
-# 👋 歡迎來到我的技術筆記網站
+﻿# 👋 歡迎來到我的技術筆記網站
 
 我是 Ze Yu Huang，這裡是我的開源筆記與實作紀錄。
 
@@ -11,8 +11,8 @@
 - [整合 Oxidized 與 Weathermap](network-monitoring/weathermap.md)
 
 ### ✔ GLPI 資產與維護管理平台
-- [GLPI Server 架設](asset-management/GLPI Server架設)
-- [LDAP / AD 整合測試紀錄](asset-management/ad-integration.md)
+- [GLPI Server 架設第一篇--伺服器安裝](asset-management/GLPI Server架設 (Apache))
+- [GLPI Server 架設第二篇--網頁初始化](asset-management/GLPI Server架設–網頁安裝開始)
 
 ### ✔ FortiGate 防火牆
 - [自動備份設定](firewall/backup.md)
