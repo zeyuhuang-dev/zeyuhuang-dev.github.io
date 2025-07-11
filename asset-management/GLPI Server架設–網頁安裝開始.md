@@ -45,7 +45,9 @@ systemctl restart httpd
 **2. 成功進入步驟 0：環境相容性檢查**
 ![2025-07-11_135242](/pics/glpi/005.png)
 **第一個待解決問題**
+
 ![2025-07-11_140906](/pics/glpi/006.png)
+
 SELinux 的某些布林開關（boolean）未開啟，可能會導致特定功能無法使用。
 | 項目                             | 意義                         | 影響功能                           | 建議              |
 | ------------------------------ | ------------------------      | -------------------------        | --------------- |
@@ -59,7 +61,9 @@ setsebool -P httpd_can_network_connect_db on
 setsebool -P httpd_can_sendmail on
 ```
 **第二個待解決問題**
+
 ![2025-07-11_142850](/pics/glpi/007.png)
+
 ⚠️ PHP 沒有安裝或啟用 LDAP 擴充套件（extension），因此無法使用 LDAP 認證功能。
 ```
 php -v
@@ -67,7 +71,9 @@ dnf install php-ldap
 systemctl restart httpd
 ```
 **第三個待解決問題**
+
 ![2025-07-11_143340](/pics/glpi/008.png)
+
 ⚠️GLPI 嘗試寫入 /var/www/html/glpi/marketplace 資料夾時失敗，無法在該目錄建立檔案或資料夾，因此 無法從 Marketplace 安裝 Plugin
 ```
 chmod 755 /var/www/html/glpi/marketplace
